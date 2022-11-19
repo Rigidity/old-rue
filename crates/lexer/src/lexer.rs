@@ -30,7 +30,7 @@ impl<'a> Lexer<'a> {
 
         let kind = match self.bump() {
             '(' => TokenKind::OpenParen,
-            ')' => TokenKind::OpenParen,
+            ')' => TokenKind::CloseParen,
             '{' => TokenKind::OpenBrace,
             '}' => TokenKind::CloseBrace,
             '<' => TokenKind::LessThan,
@@ -107,5 +107,101 @@ impl<'a> Iterator for Lexer<'a> {
         };
 
         Some(token)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn lex(source: &str) -> Vec<TokenKind> {
+        Lexer::new(source)
+            .map(|token| token.kind)
+            .collect::<Vec<_>>()
+    }
+
+    #[test]
+    fn ident() {
+        assert_eq!(lex("hello_world"), &[TokenKind::Ident])
+    }
+
+    #[test]
+    fn def_kw() {
+        assert_eq!(lex("def"), &[TokenKind::DefKw])
+    }
+
+    #[test]
+    fn open_paren() {
+        assert_eq!(lex("("), &[TokenKind::OpenParen])
+    }
+
+    #[test]
+    fn close_paren() {
+        assert_eq!(lex(")"), &[TokenKind::CloseParen])
+    }
+
+    #[test]
+    fn open_brace() {
+        assert_eq!(lex("{"), &[TokenKind::OpenBrace])
+    }
+
+    #[test]
+    fn close_brace() {
+        assert_eq!(lex("}"), &[TokenKind::CloseBrace])
+    }
+
+    #[test]
+    fn less_than() {
+        assert_eq!(lex("<"), &[TokenKind::LessThan])
+    }
+
+    #[test]
+    fn greater_than() {
+        assert_eq!(lex(">"), &[TokenKind::GreaterThan])
+    }
+
+    #[test]
+    fn plus() {
+        assert_eq!(lex("+"), &[TokenKind::Plus])
+    }
+
+    #[test]
+    fn minus() {
+        assert_eq!(lex("-"), &[TokenKind::Minus])
+    }
+
+    #[test]
+    fn star() {
+        assert_eq!(lex("*"), &[TokenKind::Star])
+    }
+
+    #[test]
+    fn slash() {
+        assert_eq!(lex("/"), &[TokenKind::Slash])
+    }
+
+    #[test]
+    fn arrow() {
+        assert_eq!(lex("->"), &[TokenKind::Arrow])
+    }
+
+    #[test]
+    fn colon() {
+        assert_eq!(lex(":"), &[TokenKind::Colon])
+    }
+
+    #[test]
+    fn comma() {
+        assert_eq!(lex(","), &[TokenKind::Comma])
+    }
+
+    #[test]
+    fn dot() {
+        assert_eq!(lex("."), &[TokenKind::Dot])
+    }
+
+    #[test]
+    fn whitespace() {
+        assert_eq!(lex("    "), &[TokenKind::Whitespace])
     }
 }
