@@ -27,10 +27,8 @@ impl<'a> Lexer<'a> {
 
         let kind = match self.bump() {
             c if c.is_xid_start() => {
-                while self.char().is_xid_continue() {
-                    self.bump();
-                }
-                TokenKind::Identifier
+                self.eat_ident();
+                TokenKind::Ident
             }
             _ => TokenKind::Error,
         };
@@ -39,6 +37,12 @@ impl<'a> Lexer<'a> {
             text: &self.source[start..self.cursor],
             kind,
             span: start..self.cursor,
+        }
+    }
+
+    fn eat_ident(&mut self) {
+        while self.char().is_xid_continue() {
+            self.bump();
         }
     }
 
