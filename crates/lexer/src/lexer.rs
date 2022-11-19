@@ -3,6 +3,10 @@ use unicode_xid::UnicodeXID;
 
 use crate::{Token, TokenKind};
 
+use self::chars::{is_ident_continue, is_ident_start};
+
+mod chars;
+
 pub struct Lexer<'a> {
     source: &'a str,
     chars: Peekable<Chars<'a>>,
@@ -26,7 +30,7 @@ impl<'a> Lexer<'a> {
         let start = self.cursor;
 
         let kind = match self.bump() {
-            c if c.is_xid_start() => {
+            c if is_ident_start(c) => {
                 self.eat_ident();
                 TokenKind::Ident
             }
@@ -41,7 +45,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn eat_ident(&mut self) {
-        while self.char().is_xid_continue() {
+        while is_ident_continue(self.char()) {
             self.bump();
         }
     }
