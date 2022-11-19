@@ -1,9 +1,8 @@
 use std::{iter::Peekable, str::Chars};
-use unicode_xid::UnicodeXID;
 
 use crate::{Token, TokenKind};
 
-use self::chars::{is_ident_continue, is_ident_start};
+use self::chars::{is_ident_continue, is_ident_start, is_whitespace};
 
 mod chars;
 
@@ -34,6 +33,10 @@ impl<'a> Lexer<'a> {
                 self.eat_ident();
                 TokenKind::Ident
             }
+            c if is_whitespace(c) => {
+                self.eat_whitespace();
+                TokenKind::Whitespace
+            }
             _ => TokenKind::Error,
         };
 
@@ -46,6 +49,12 @@ impl<'a> Lexer<'a> {
 
     fn eat_ident(&mut self) {
         while is_ident_continue(self.char()) {
+            self.bump();
+        }
+    }
+
+    fn eat_whitespace(&mut self) {
+        while is_whitespace(self.char()) {
             self.bump();
         }
     }
