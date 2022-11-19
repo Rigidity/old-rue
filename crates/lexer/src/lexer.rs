@@ -1,4 +1,5 @@
 use std::{iter::Peekable, str::Chars};
+use unicode_xid::UnicodeXID;
 
 use crate::{Token, TokenKind};
 
@@ -21,11 +22,37 @@ impl<'a> Lexer<'a> {
         self.cursor < self.source.len()
     }
 
-    fn token(&self) -> Token<'a> {
+    fn token(&mut self) -> Token<'a> {
+        let start = self.cursor;
+
+        let kind = match self.bump() {
+            c if c.is_xid_start() => {
+                while self.char().is_xid_continue() {
+                    self.bump();
+                }
+                TokenKind::Identifier
+            }
+            _ => TokenKind::Error,
+        };
+
         Token {
-            text: "",
-            kind: TokenKind::Error,
-            span: 0..0,
+            text: &self.source[start..self.cursor],
+            kind,
+            span: start..self.cursor,
+        }
+    }
+
+    fn char(&mut self) -> char {
+        *self.chars.peek().unwrap_or(&'\0')
+    }
+
+    fn bump(&mut self) -> char {
+        match self.chars.next() {
+            Some(c) => {
+                self.cursor += c.len_utf8();
+                c
+            }
+            None => '\0',
         }
     }
 }
