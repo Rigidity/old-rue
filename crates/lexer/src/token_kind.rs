@@ -1,6 +1,21 @@
 #[derive(Debug, Copy, Clone)]
 pub enum TokenKind {
     Ident,
+    DefKw,
+    OpenParen,
+    CloseParen,
+    OpenBrace,
+    CloseBrace,
+    LessThan,
+    GreaterThan,
+    Plus,
+    Minus,
+    Star,
+    Slash,
+    Arrow,
+    Colon,
+    Comma,
+    Dot,
     Whitespace,
     Error,
 }

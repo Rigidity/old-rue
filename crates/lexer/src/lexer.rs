@@ -29,9 +29,31 @@ impl<'a> Lexer<'a> {
         let start = self.cursor;
 
         let kind = match self.bump() {
+            '(' => TokenKind::OpenParen,
+            ')' => TokenKind::OpenParen,
+            '{' => TokenKind::OpenBrace,
+            '}' => TokenKind::CloseBrace,
+            '<' => TokenKind::LessThan,
+            '>' => TokenKind::GreaterThan,
+            '+' => TokenKind::Plus,
+            '-' => match self.char() {
+                '>' => {
+                    self.bump();
+                    TokenKind::Arrow
+                }
+                _ => TokenKind::Minus,
+            },
+            '*' => TokenKind::Star,
+            '/' => TokenKind::Slash,
+            ':' => TokenKind::Colon,
+            ',' => TokenKind::Comma,
+            '.' => TokenKind::Dot,
             c if is_ident_start(c) => {
                 self.eat_ident();
-                TokenKind::Ident
+                match &self.source[start..self.cursor] {
+                    "def" => TokenKind::DefKw,
+                    _ => TokenKind::Ident,
+                }
             }
             c if is_whitespace(c) => {
                 self.eat_whitespace();
