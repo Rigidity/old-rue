@@ -1,3 +1,6 @@
+use lexer::Lexer;
+
 fn main() {
-    println!("Hello, world!");
+    let source = "hello";
+    let lexer = Lexer::new(source);
 }
