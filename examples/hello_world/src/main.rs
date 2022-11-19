@@ -2,6 +2,6 @@ use lexer::Lexer;
 
 fn main() {
     let source = "hello";
-    let mut lexer = Lexer::new(source);
-    dbg!(lexer.next());
+    let tokens = Lexer::new(source).collect::<Vec<_>>();
+    dbg!(tokens);
 }
