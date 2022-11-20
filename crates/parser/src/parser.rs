@@ -1,11 +1,10 @@
 use lexer::{Token, TokenKind};
-use syntax::SyntaxKind;
 
-use crate::{event::Event, output::Output, sink::Sink};
+use crate::{event::Event, grammar::root, output::Output, sink::Sink};
 
 use self::marker::Marker;
 
-mod marker;
+pub mod marker;
 
 pub struct Parser<'a, 't> {
     source: &'a [Token<'t>],
@@ -23,19 +22,17 @@ impl<'a, 't> Parser<'a, 't> {
     }
 
     pub fn parse(mut self) -> Output {
-        let m = self.start();
-        m.complete(&mut self, SyntaxKind::Root);
-
+        root(&mut self);
         Sink::new(self.events, self.source).finish()
     }
 
-    fn start(&mut self) -> Marker {
+    pub(crate) fn start(&mut self) -> Marker {
         let pos = self.events.len();
         self.events.push(Event::Placeholder);
         Marker::new(pos)
     }
 
-    fn bump(&mut self) {
+    pub(crate) fn bump(&mut self) {
         let token = self.next_token().unwrap();
 
         self.events.push(Event::AddToken {
@@ -44,16 +41,16 @@ impl<'a, 't> Parser<'a, 't> {
         })
     }
 
-    pub fn next_token(&mut self) -> Option<&'a Token<'t>> {
+    pub(crate) fn peek(&mut self) -> Option<TokenKind> {
+        self.eat_trivia();
+        self.peek_raw()
+    }
+
+    fn next_token(&mut self) -> Option<&'a Token<'t>> {
         self.eat_trivia();
         let lexeme = self.source.get(self.cursor)?;
         self.cursor += 1;
         Some(lexeme)
-    }
-
-    pub fn peek(&mut self) -> Option<TokenKind> {
-        self.eat_trivia();
-        self.peek_raw()
     }
 
     fn eat_trivia(&mut self) {

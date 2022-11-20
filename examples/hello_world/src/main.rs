@@ -3,7 +3,7 @@ use parser::{Output, Parser};
 use syntax::SyntaxNode;
 
 fn main() {
-    let source = "3 + 2";
+    let source = "hello";
     let tokens = Lexer::new(source).collect::<Vec<_>>();
     let parser = Parser::new(&tokens);
     let Output { green_node } = parser.parse();
