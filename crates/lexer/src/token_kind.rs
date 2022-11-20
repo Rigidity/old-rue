@@ -19,3 +19,9 @@ pub enum TokenKind {
     Whitespace,
     Error,
 }
+
+impl TokenKind {
+    pub fn is_trivia(self) -> bool {
+        matches!(self, Self::Whitespace)
+    }
+}

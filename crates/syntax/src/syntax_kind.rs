@@ -21,6 +21,8 @@ pub enum SyntaxKind {
     Dot,
     Whitespace,
     Error,
+
+    Root,
 }
 
 impl From<TokenKind> for SyntaxKind {
