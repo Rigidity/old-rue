@@ -1,14 +1,14 @@
 use syntax::SyntaxKind;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Event<'a> {
+pub enum Event {
     StartNode {
         kind: SyntaxKind,
         forward_parent: Option<usize>,
     },
     AddToken {
         kind: SyntaxKind,
-        text: &'a str,
+        token_count: usize,
     },
     FinishNode,
     Placeholder,

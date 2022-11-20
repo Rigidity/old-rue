@@ -5,14 +5,14 @@ use syntax::{RueLanguage, SyntaxKind};
 use crate::{event::Event, output::Output};
 
 pub struct Sink<'a, 't> {
-    events: Vec<Event<'a>>,
+    events: Vec<Event>,
     source: &'a [Token<'t>],
     cursor: usize,
     builder: GreenNodeBuilder<'static>,
 }
 
 impl<'a, 't> Sink<'a, 't> {
-    pub fn new(events: Vec<Event<'a>>, source: &'a [Token<'t>]) -> Self {
+    pub fn new(events: Vec<Event>, source: &'a [Token<'t>]) -> Self {
         Self {
             events,
             source,
@@ -53,7 +53,7 @@ impl<'a, 't> Sink<'a, 't> {
                         self.builder.start_node(RueLanguage::kind_to_raw(kind));
                     }
                 }
-                Event::AddToken { kind, text } => self.token(kind, text),
+                Event::AddToken { kind, token_count } => self.token(kind, token_count),
                 Event::FinishNode => self.builder.finish_node(),
                 Event::Placeholder => {}
             }
@@ -69,15 +69,22 @@ impl<'a, 't> Sink<'a, 't> {
     fn eat_trivia(&mut self) {
         while let Some(token) = self.source.get(self.cursor) {
             if token.kind.is_trivia() {
-                self.token(token.kind.into(), token.text);
+                self.token(token.kind.into(), 1);
             } else {
                 break;
             }
         }
     }
 
-    fn token(&mut self, kind: SyntaxKind, text: &'a str) {
-        self.builder.token(RueLanguage::kind_to_raw(kind), text);
-        self.cursor += 1;
+    fn token(&mut self, kind: SyntaxKind, token_count: usize) {
+        let mut text = String::new();
+        let tokens = &self.source[self.cursor..self.cursor + token_count];
+
+        for token in tokens {
+            text.push_str(token.text);
+        }
+
+        self.builder.token(RueLanguage::kind_to_raw(kind), &text);
+        self.cursor += token_count;
     }
 }

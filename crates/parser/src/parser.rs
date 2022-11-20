@@ -1,29 +1,49 @@
 use lexer::{Token, TokenKind};
 
-use crate::{event::Event, grammar::root, output::Output, sink::Sink};
+use crate::{event::Event, grammar::root, input::Input, output::Output, sink::Sink};
 
 use self::marker::Marker;
 
 pub mod marker;
 
-pub struct Parser<'a, 't> {
-    source: &'a [Token<'t>],
+pub struct Parser {
+    input: Input,
     cursor: usize,
-    events: Vec<Event<'a>>,
+    events: Vec<Event>,
 }
 
-impl<'a, 't> Parser<'a, 't> {
-    pub fn new(source: &'a [Token<'t>]) -> Self {
+impl Parser {
+    fn new(input: Input) -> Self {
         Self {
-            source,
+            input,
             cursor: 0,
             events: Vec::new(),
         }
     }
 
-    pub fn parse(mut self) -> Output {
-        root(&mut self);
-        Sink::new(self.events, self.source).finish()
+    pub fn parse(source: &[Token]) -> Output {
+        let mut input = Input::default();
+        let mut joint = false;
+
+        for token in source {
+            if token.kind.is_trivia() {
+                joint = false;
+            } else {
+                input.push(token.kind);
+
+                if joint {
+                    input.was_joint();
+                }
+            }
+        }
+
+        let mut parser = Self::new(input);
+        root(&mut parser);
+        Sink::new(parser.finish(), source).finish()
+    }
+
+    fn finish(self) -> Vec<Event> {
+        self.events
     }
 
     pub(crate) fn start(&mut self) -> Marker {
@@ -33,33 +53,15 @@ impl<'a, 't> Parser<'a, 't> {
     }
 
     pub(crate) fn bump(&mut self) {
-        let token = self.next_token().unwrap();
+        let kind = self.peek().unwrap();
 
         self.events.push(Event::AddToken {
-            kind: token.kind.into(),
-            text: token.text,
+            kind: kind.into(),
+            token_count: 1,
         })
     }
 
     pub(crate) fn peek(&mut self) -> Option<TokenKind> {
-        self.eat_trivia();
-        self.peek_raw()
-    }
-
-    fn next_token(&mut self) -> Option<&'a Token<'t>> {
-        self.eat_trivia();
-        let lexeme = self.source.get(self.cursor)?;
-        self.cursor += 1;
-        Some(lexeme)
-    }
-
-    fn eat_trivia(&mut self) {
-        while self.peek_raw().map_or(false, |kind| kind.is_trivia()) {
-            self.cursor += 1;
-        }
-    }
-
-    fn peek_raw(&self) -> Option<TokenKind> {
-        self.source.get(self.cursor).map(|token| token.kind)
+        self.input.kind(self.cursor)
     }
 }
