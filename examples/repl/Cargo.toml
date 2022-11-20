@@ -1,0 +1,9 @@
+[package]
+name = "repl"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lexer = { path = "../../crates/lexer" }
+parser = { path = "../../crates/parser" }
+syntax = { path = "../../crates/syntax" }

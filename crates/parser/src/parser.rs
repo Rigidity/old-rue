@@ -52,11 +52,11 @@ impl Parser {
         Marker::new(pos)
     }
 
-    pub(crate) fn peek(&mut self) -> Option<TokenKind> {
+    pub(crate) fn peek(&self) -> Option<TokenKind> {
         self.nth(0)
     }
 
-    pub(crate) fn nth(&mut self, index: usize) -> Option<TokenKind> {
+    pub(crate) fn nth(&self, index: usize) -> Option<TokenKind> {
         self.input.kind(self.cursor + index)
     }
 
