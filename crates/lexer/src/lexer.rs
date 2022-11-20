@@ -27,6 +27,7 @@ impl<'a> Lexer<'a> {
 
     fn token(&mut self) -> Token<'a> {
         let start = self.cursor;
+        let mut error = None;
 
         let kind = match self.bump() {
             '(' => TokenKind::OpenParen,
@@ -48,6 +49,18 @@ impl<'a> Lexer<'a> {
             ':' => TokenKind::Colon,
             ',' => TokenKind::Comma,
             '.' => TokenKind::Dot,
+            '"' => {
+                if !self.eat_string('"') {
+                    error = Some("Unterminated string literal");
+                }
+                TokenKind::String
+            }
+            '\'' => {
+                if !self.eat_string('\'') {
+                    error = Some("Unterminated string literal");
+                }
+                TokenKind::String
+            }
             c if is_ident_start(c) => {
                 self.eat_ident();
                 match &self.source[start..self.cursor] {
@@ -66,6 +79,17 @@ impl<'a> Lexer<'a> {
             text: &self.source[start..self.cursor],
             kind,
             span: start..self.cursor,
+            error,
+        }
+    }
+
+    fn eat_string(&mut self, quote: char) -> bool {
+        loop {
+            match self.bump() {
+                '\0' => return false,
+                c if c == quote => return true,
+                _ => {}
+            }
         }
     }
 

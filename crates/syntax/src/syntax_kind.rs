@@ -4,6 +4,7 @@ use num_derive::{FromPrimitive, ToPrimitive};
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, ToPrimitive, FromPrimitive)]
 pub enum SyntaxKind {
     Ident,
+    String,
     DefKw,
     OpenParen,
     CloseParen,
@@ -29,6 +30,7 @@ impl From<TokenKind> for SyntaxKind {
     fn from(value: TokenKind) -> Self {
         match value {
             TokenKind::Ident => Self::Ident,
+            TokenKind::String => Self::String,
             TokenKind::DefKw => Self::DefKw,
             TokenKind::OpenParen => Self::OpenParen,
             TokenKind::CloseParen => Self::CloseParen,

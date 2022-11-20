@@ -7,4 +7,5 @@ pub struct Token<'a> {
     pub text: &'a str,
     pub kind: TokenKind,
     pub span: Range<usize>,
+    pub error: Option<&'a str>,
 }
