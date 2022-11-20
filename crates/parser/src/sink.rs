@@ -22,23 +22,40 @@ impl<'a, 't> Sink<'a, 't> {
     }
 
     pub fn finish(mut self) -> Output {
-        let mut reordered_events = self.events.clone();
+        for i in 0..self.events.len() {
+            match std::mem::replace(&mut self.events[i], Event::Placeholder) {
+                Event::StartNode {
+                    kind,
+                    forward_parent,
+                } => {
+                    let mut kinds = vec![kind];
 
-        for (idx, event) in self.events.iter().enumerate() {
-            if let Event::StartNodeAt { kind, checkpoint } = event {
-                reordered_events.remove(idx);
-                reordered_events.insert(*checkpoint, Event::StartNode { kind: *kind });
-            }
-        }
+                    let mut i = i;
+                    let mut forward_parent = forward_parent;
 
-        for event in reordered_events {
-            match event {
-                Event::StartNode { kind } => {
-                    self.builder.start_node(RueLanguage::kind_to_raw(kind))
+                    while let Some(fp) = forward_parent {
+                        i += fp;
+
+                        forward_parent = if let Event::StartNode {
+                            kind,
+                            forward_parent,
+                        } =
+                            std::mem::replace(&mut self.events[i], Event::Placeholder)
+                        {
+                            kinds.push(kind);
+                            forward_parent
+                        } else {
+                            unreachable!()
+                        };
+                    }
+
+                    for kind in kinds.into_iter().rev() {
+                        self.builder.start_node(RueLanguage::kind_to_raw(kind));
+                    }
                 }
-                Event::StartNodeAt { .. } => unreachable!(),
                 Event::AddToken { kind, text } => self.token(kind, text),
                 Event::FinishNode => self.builder.finish_node(),
+                Event::Placeholder => {}
             }
 
             self.eat_trivia();
@@ -53,6 +70,8 @@ impl<'a, 't> Sink<'a, 't> {
         while let Some(token) = self.source.get(self.cursor) {
             if token.kind.is_trivia() {
                 self.token(token.kind.into(), token.text);
+            } else {
+                break;
             }
         }
     }

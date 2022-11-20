@@ -1,9 +1,15 @@
 use syntax::SyntaxKind;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Event<'a> {
-    StartNode { kind: SyntaxKind },
-    StartNodeAt { kind: SyntaxKind, checkpoint: usize },
-    AddToken { kind: SyntaxKind, text: &'a str },
+    StartNode {
+        kind: SyntaxKind,
+        forward_parent: Option<usize>,
+    },
+    AddToken {
+        kind: SyntaxKind,
+        text: &'a str,
+    },
     FinishNode,
+    Placeholder,
 }
