@@ -10,6 +10,7 @@ pub enum Event {
         kind: SyntaxKind,
         token_count: usize,
     },
+    Error(String),
     FinishNode,
     Placeholder,
 }

@@ -1,13 +1,13 @@
-use lexer::TokenKind;
+use syntax::SyntaxKind;
 
 #[derive(Default)]
 pub struct Input {
-    kinds: Vec<TokenKind>,
+    kinds: Vec<SyntaxKind>,
     joint: Vec<bool>,
 }
 
 impl Input {
-    pub fn push(&mut self, kind: TokenKind) {
+    pub fn push(&mut self, kind: SyntaxKind) {
         if self.joint.len() < self.kinds.len() {
             self.joint.push(false);
         }
@@ -23,8 +23,8 @@ impl Input {
         self.joint.push(true);
     }
 
-    pub fn kind(&self, index: usize) -> Option<TokenKind> {
-        self.kinds.get(index).copied()
+    pub fn kind(&self, index: usize) -> SyntaxKind {
+        self.kinds.get(index).copied().unwrap_or(SyntaxKind::Eof)
     }
 
     pub fn is_joint(&self, index: usize) -> bool {

@@ -23,6 +23,8 @@ pub enum SyntaxKind {
     Whitespace,
     Error,
 
+    Eof,
+
     Root,
 }
 
@@ -51,3 +53,24 @@ impl From<TokenKind> for SyntaxKind {
         }
     }
 }
+
+#[macro_export]
+macro_rules ! T {
+    [def] => { SyntaxKind::DefKw };
+    ['('] => { SyntaxKind::OpenParen };
+    [')'] => { SyntaxKind::CloseParen };
+    ['{'] => { SyntaxKind::OpenBrace };
+    ['}'] => { SyntaxKind::CloseBrace };
+    [<] => { SyntaxKind::LessThan };
+    [>] => { SyntaxKind::GreaterThan };
+    [+] => { SyntaxKind::Plus };
+    [-] => { SyntaxKind::Minus };
+    [*] => { SyntaxKind::Star };
+    [/] => { SyntaxKind::Slash };
+    [->] => { SyntaxKind::Arrow };
+    [:] => { SyntaxKind::Colon };
+    [,] => { SyntaxKind::Comma };
+    [.] => { SyntaxKind::Dot };
+}
+
+pub use T;

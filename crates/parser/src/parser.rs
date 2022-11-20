@@ -1,4 +1,5 @@
-use lexer::{Token, TokenKind};
+use lexer::Token;
+use syntax::{SyntaxKind, T};
 
 use crate::{event::Event, grammar::root, input::Input, output::Output, sink::Sink};
 
@@ -29,7 +30,7 @@ impl Parser {
             if token.kind.is_trivia() {
                 joint = false;
             } else {
-                input.push(token.kind);
+                input.push(token.kind.into());
 
                 if joint {
                     input.was_joint();
@@ -52,21 +53,100 @@ impl Parser {
         Marker::new(pos)
     }
 
-    pub(crate) fn peek(&self) -> Option<TokenKind> {
+    pub(crate) fn peek(&self) -> SyntaxKind {
         self.nth(0)
     }
 
-    pub(crate) fn nth(&self, index: usize) -> Option<TokenKind> {
-        self.input.kind(self.cursor + index)
+    pub(crate) fn nth(&self, n: usize) -> SyntaxKind {
+        self.input.kind(self.cursor + n)
     }
 
-    pub(crate) fn bump(&mut self) {
-        let kind = self.peek().unwrap();
-        self.cursor += 1;
+    pub(crate) fn at(&self, kind: SyntaxKind) -> bool {
+        self.nth_at(0, kind)
+    }
 
-        self.events.push(Event::AddToken {
-            kind: kind.into(),
-            token_count: 1,
-        })
+    pub(crate) fn nth_at(&self, n: usize, kind: SyntaxKind) -> bool {
+        match kind {
+            T![->] => self.at_composite2(n, T![-], T![>]),
+            _ => self.input.kind(self.cursor + n) == kind,
+        }
+    }
+
+    pub(crate) fn at_set(&self, kinds: &[SyntaxKind]) -> bool {
+        kinds.contains(&self.peek())
+    }
+
+    fn at_composite2(&self, n: usize, a: SyntaxKind, b: SyntaxKind) -> bool {
+        self.nth(n) == a && self.nth(n + 1) == b && self.input.is_joint(n)
+    }
+
+    pub(crate) fn eat(&mut self, kind: SyntaxKind) -> bool {
+        if !self.at(kind) {
+            return false;
+        }
+
+        let token_count = match kind {
+            T![->] => 2,
+            _ => 1,
+        };
+
+        self.add_token(kind, token_count);
+        true
+    }
+
+    pub(crate) fn bump(&mut self, kind: SyntaxKind) {
+        assert!(self.eat(kind));
+    }
+
+    pub(crate) fn bump_any(&mut self) {
+        let kind = self.nth(0);
+        if kind == SyntaxKind::Eof {
+            return;
+        }
+        self.add_token(kind, 1);
+    }
+
+    pub(crate) fn error<T>(&mut self, message: T)
+    where
+        T: Into<String>,
+    {
+        self.events.push(Event::Error(message.into()));
+    }
+
+    pub(crate) fn expect(&mut self, kind: SyntaxKind) -> bool {
+        if self.eat(kind) {
+            return true;
+        }
+        self.error(format!("expected {:?}", kind));
+        false
+    }
+
+    pub(crate) fn err_and_bump(&mut self, message: &str) {
+        self.err_recover(message, &[]);
+    }
+
+    pub(crate) fn err_recover(&mut self, message: &str, recovery: &[SyntaxKind]) {
+        match self.peek() {
+            T!['{'] | T!['}'] => {
+                self.error(message);
+                return;
+            }
+            _ => (),
+        }
+
+        if self.at_set(recovery) {
+            self.error(message);
+            return;
+        }
+
+        let m = self.start();
+        self.error(message);
+        self.bump_any();
+        m.complete(self, SyntaxKind::Error);
+    }
+
+    pub(crate) fn add_token(&mut self, kind: SyntaxKind, token_count: usize) {
+        self.cursor += token_count;
+        self.events.push(Event::AddToken { kind, token_count })
     }
 }
