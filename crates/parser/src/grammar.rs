@@ -13,7 +13,7 @@ fn parse(source: &str) -> String {
     use syntax::SyntaxNode;
 
     let tokens = Lexer::new(source).collect::<Vec<_>>();
-    let output = Parser::new(&tokens).parse();
+    let output = Parser::parse(&tokens);
     let syntax_node = SyntaxNode::new_root(output.green_node);
     let debug_tree = format!("{:#?}", syntax_node);
 
