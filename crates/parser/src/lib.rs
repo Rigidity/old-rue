@@ -9,3 +9,4 @@ mod sink;
 pub use crate::parser::*;
 pub use input::*;
 pub use output::*;
+pub use parse_error::*;
