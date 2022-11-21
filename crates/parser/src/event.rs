@@ -12,5 +12,13 @@ pub enum Event {
     },
     Error(String),
     FinishNode,
-    Placeholder,
+}
+
+impl Event {
+    pub fn tombstone() -> Self {
+        Self::StartNode {
+            kind: SyntaxKind::Tombstone,
+            forward_parent: None,
+        }
+    }
 }

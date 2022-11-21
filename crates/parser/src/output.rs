@@ -1,8 +1,11 @@
 use rowan::GreenNode;
 use syntax::SyntaxNode;
 
+use crate::parse_error::ParseError;
+
 pub struct Output {
     pub green_node: GreenNode,
+    pub errors: Vec<ParseError>,
 }
 
 impl Output {

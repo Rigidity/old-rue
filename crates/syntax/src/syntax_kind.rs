@@ -6,6 +6,7 @@ pub enum SyntaxKind {
     Ident,
     String,
     DefKw,
+    LetKw,
     OpenParen,
     CloseParen,
     OpenBrace,
@@ -24,8 +25,13 @@ pub enum SyntaxKind {
     Error,
 
     Eof,
+    Tombstone,
 
     Root,
+    Literal,
+    ParenExpr,
+    BinaryExpr,
+    PrefixExpr,
 }
 
 impl From<TokenKind> for SyntaxKind {
@@ -34,6 +40,7 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::Ident => Self::Ident,
             TokenKind::String => Self::String,
             TokenKind::DefKw => Self::DefKw,
+            TokenKind::LetKw => Self::LetKw,
             TokenKind::OpenParen => Self::OpenParen,
             TokenKind::CloseParen => Self::CloseParen,
             TokenKind::OpenBrace => Self::OpenBrace,
@@ -57,6 +64,7 @@ impl From<TokenKind> for SyntaxKind {
 #[macro_export]
 macro_rules ! T {
     [def] => { SyntaxKind::DefKw };
+    [let] => { SyntaxKind::LetKw };
     ['('] => { SyntaxKind::OpenParen };
     [')'] => { SyntaxKind::CloseParen };
     ['{'] => { SyntaxKind::OpenBrace };

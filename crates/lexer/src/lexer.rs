@@ -65,6 +65,7 @@ impl<'a> Lexer<'a> {
                 self.eat_ident();
                 match &self.source[start..self.cursor] {
                     "def" => TokenKind::DefKw,
+                    "let" => TokenKind::LetKw,
                     _ => TokenKind::Ident,
                 }
             }

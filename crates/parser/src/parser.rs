@@ -1,5 +1,5 @@
 use lexer::Token;
-use syntax::{SyntaxKind, T};
+use syntax::{Set, SyntaxKind, EMPTY_SET, T};
 
 use crate::{event::Event, grammar::root, input::Input, output::Output, sink::Sink};
 
@@ -49,7 +49,7 @@ impl Parser {
 
     pub(crate) fn start(&mut self) -> Marker {
         let pos = self.events.len();
-        self.events.push(Event::Placeholder);
+        self.events.push(Event::tombstone());
         Marker::new(pos)
     }
 
@@ -72,8 +72,8 @@ impl Parser {
         }
     }
 
-    pub(crate) fn at_set(&self, kinds: &[SyntaxKind]) -> bool {
-        kinds.contains(&self.peek())
+    pub(crate) fn at_set(&self, kinds: Set) -> bool {
+        kinds.contains(self.peek())
     }
 
     fn at_composite2(&self, n: usize, a: SyntaxKind, b: SyntaxKind) -> bool {
@@ -122,10 +122,10 @@ impl Parser {
     }
 
     pub(crate) fn err_and_bump(&mut self, message: &str) {
-        self.err_recover(message, &[]);
+        self.err_recover(message, EMPTY_SET);
     }
 
-    pub(crate) fn err_recover(&mut self, message: &str, recovery: &[SyntaxKind]) {
+    pub(crate) fn err_recover(&mut self, message: &str, recovery: Set) {
         match self.peek() {
             T!['{'] | T!['}'] => {
                 self.error(message);
