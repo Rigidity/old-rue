@@ -15,7 +15,7 @@ fn main() -> io::Result<()> {
         stdin.read_line(&mut input)?;
 
         let tokens = Lexer::new(&input.trim()).collect::<Vec<_>>();
-        let output = Parser::parse(&tokens);
+        let output = Parser::parse_tokens(&tokens);
 
         println!("{}", output.debug_tree());
 

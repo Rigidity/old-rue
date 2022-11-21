@@ -29,6 +29,7 @@ pub enum SyntaxKind {
 
     Root,
     Literal,
+    NameRef,
     ParenExpr,
     BinaryExpr,
     PrefixExpr,

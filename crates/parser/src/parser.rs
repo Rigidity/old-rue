@@ -1,5 +1,5 @@
 use lexer::Token;
-use syntax::{Set, SyntaxKind, EMPTY_SET, T};
+use syntax::{Set, SyntaxKind, T};
 
 use crate::{event::Event, grammar::root, input::Input, output::Output, sink::Sink};
 
@@ -14,7 +14,7 @@ pub struct Parser {
 }
 
 impl Parser {
-    fn new(input: Input) -> Self {
+    pub fn new(input: Input) -> Self {
         Self {
             input,
             cursor: 0,
@@ -22,25 +22,14 @@ impl Parser {
         }
     }
 
-    pub fn parse(source: &[Token]) -> Output {
-        let mut input = Input::default();
-        let mut joint = false;
-
-        for token in source {
-            if token.kind.is_trivia() {
-                joint = false;
-            } else {
-                input.push(token.kind.into());
-
-                if joint {
-                    input.was_joint();
-                }
-            }
-        }
-
-        let mut parser = Self::new(input);
+    pub fn parse_tokens(tokens: &[Token]) -> Output {
+        let mut parser = Self::new(Input::from_tokens(tokens));
         root(&mut parser);
-        Sink::new(parser.finish(), source).finish()
+        parser.parse(tokens)
+    }
+
+    pub(crate) fn parse(self, tokens: &[Token]) -> Output {
+        Sink::new(self.finish(), tokens).finish()
     }
 
     fn finish(self) -> Vec<Event> {
@@ -119,10 +108,6 @@ impl Parser {
         }
         self.error(format!("expected {:?}", kind));
         false
-    }
-
-    pub(crate) fn err_and_bump(&mut self, message: &str) {
-        self.err_recover(message, EMPTY_SET);
     }
 
     pub(crate) fn err_recover(&mut self, message: &str, recovery: Set) {

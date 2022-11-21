@@ -30,15 +30,20 @@ fn atom_expr(p: &mut Parser) -> Option<CompletedMarker> {
         return Some(cm);
     }
 
-    let m = match p.peek() {
+    let cm = match p.peek() {
         T!['('] => paren_expr(p),
+        SyntaxKind::Ident => {
+            let m = p.start();
+            p.bump_any();
+            m.complete(p, SyntaxKind::NameRef)
+        }
         _ => {
             p.err_recover("expected expression", EXPR_RECOVERY_SET);
             return None;
         }
     };
 
-    Some(m)
+    Some(cm)
 }
 
 fn paren_expr(p: &mut Parser) -> CompletedMarker {

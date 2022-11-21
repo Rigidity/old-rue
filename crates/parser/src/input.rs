@@ -1,3 +1,4 @@
+use lexer::Token;
 use syntax::SyntaxKind;
 
 #[derive(Default)]
@@ -7,6 +8,25 @@ pub struct Input {
 }
 
 impl Input {
+    pub fn from_tokens(tokens: &[Token]) -> Self {
+        let mut result = Self::default();
+        let mut joint = false;
+
+        for token in tokens {
+            if token.kind.is_trivia() {
+                joint = false;
+            } else {
+                result.push(token.kind.into());
+
+                if joint {
+                    result.was_joint();
+                }
+            }
+        }
+
+        result
+    }
+
     pub fn push(&mut self, kind: SyntaxKind) {
         if self.joint.len() < self.kinds.len() {
             self.joint.push(false);

@@ -6,17 +6,17 @@ use crate::{event::Event, output::Output, parse_error::ParseError};
 
 pub struct Sink<'a, 't> {
     events: Vec<Event>,
-    source: &'a [Token<'t>],
+    tokens: &'a [Token<'t>],
     cursor: usize,
     builder: GreenNodeBuilder<'static>,
     errors: Vec<ParseError>,
 }
 
 impl<'a, 't> Sink<'a, 't> {
-    pub fn new(events: Vec<Event>, source: &'a [Token<'t>]) -> Self {
+    pub fn new(events: Vec<Event>, tokens: &'a [Token<'t>]) -> Self {
         Self {
             events,
-            source,
+            tokens,
             cursor: 0,
             builder: GreenNodeBuilder::new(),
             errors: Vec::new(),
@@ -58,7 +58,7 @@ impl<'a, 't> Sink<'a, 't> {
                 Event::FinishNode => self.builder.finish_node(),
                 Event::AddToken { kind, token_count } => self.token(kind, token_count),
                 Event::Error(message) => {
-                    let span = match self.source.get(self.cursor) {
+                    let span = match self.tokens.get(self.cursor) {
                         Some(token) => TextRange::new(
                             TextSize::from(token.span.start as u32),
                             TextSize::from(token.span.end as u32),
@@ -79,7 +79,7 @@ impl<'a, 't> Sink<'a, 't> {
     }
 
     fn eat_trivia(&mut self) {
-        while let Some(token) = self.source.get(self.cursor) {
+        while let Some(token) = self.tokens.get(self.cursor) {
             if token.kind.is_trivia() {
                 self.token(token.kind.into(), 1);
             } else {
@@ -90,7 +90,7 @@ impl<'a, 't> Sink<'a, 't> {
 
     fn token(&mut self, kind: SyntaxKind, token_count: usize) {
         let mut text = String::new();
-        let tokens = &self.source[self.cursor..self.cursor + token_count];
+        let tokens = &self.tokens[self.cursor..self.cursor + token_count];
 
         for token in tokens {
             text.push_str(token.text);

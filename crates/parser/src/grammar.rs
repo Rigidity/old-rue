@@ -13,11 +13,18 @@ pub fn root(p: &mut Parser) -> CompletedMarker {
 }
 
 #[cfg(test)]
-fn parse(source: &str) -> String {
+fn parse<F>(source: &str, f: F) -> String
+where
+    F: FnOnce(&mut Parser),
+{
+    use crate::Input;
     use lexer::Lexer;
 
     let tokens = Lexer::new(source).collect::<Vec<_>>();
-    Parser::parse(&tokens).debug_tree()
+    let mut parser = Parser::new(Input::from_tokens(&tokens));
+
+    f(&mut parser);
+    parser.parse(&tokens).debug_tree()
 }
 
 #[cfg(test)]
@@ -28,6 +35,8 @@ mod tests {
 
     #[test]
     fn parse_root() {
-        expect![[r#"Root@0..0"#]].assert_eq(&parse(""));
+        expect![[r#"Root@0..0"#]].assert_eq(&parse("", |p| {
+            root(p);
+        }));
     }
 }
