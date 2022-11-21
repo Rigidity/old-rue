@@ -4,6 +4,8 @@ pub enum TokenKind {
     String,
     DefKw,
     LetKw,
+    TrueKw,
+    FalseKw,
     OpenParen,
     CloseParen,
     OpenBrace,

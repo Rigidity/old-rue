@@ -66,6 +66,8 @@ impl<'a> Lexer<'a> {
                 match &self.source[start..self.cursor] {
                     "def" => TokenKind::DefKw,
                     "let" => TokenKind::LetKw,
+                    "true" => TokenKind::TrueKw,
+                    "false" => TokenKind::FalseKw,
                     _ => TokenKind::Ident,
                 }
             }

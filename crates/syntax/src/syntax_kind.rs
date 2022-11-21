@@ -7,6 +7,8 @@ pub enum SyntaxKind {
     String,
     DefKw,
     LetKw,
+    TrueKw,
+    FalseKw,
     OpenParen,
     CloseParen,
     OpenBrace,
@@ -42,6 +44,8 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::String => Self::String,
             TokenKind::DefKw => Self::DefKw,
             TokenKind::LetKw => Self::LetKw,
+            TokenKind::TrueKw => Self::TrueKw,
+            TokenKind::FalseKw => Self::FalseKw,
             TokenKind::OpenParen => Self::OpenParen,
             TokenKind::CloseParen => Self::CloseParen,
             TokenKind::OpenBrace => Self::OpenBrace,
@@ -66,6 +70,8 @@ impl From<TokenKind> for SyntaxKind {
 macro_rules ! T {
     [def] => { SyntaxKind::DefKw };
     [let] => { SyntaxKind::LetKw };
+    [true] => { SyntaxKind::TrueKw };
+    [false] => { SyntaxKind::FalseKw };
     ['('] => { SyntaxKind::OpenParen };
     [')'] => { SyntaxKind::CloseParen };
     ['{'] => { SyntaxKind::OpenBrace };
