@@ -21,6 +21,7 @@ fn literal(p: &mut Parser) -> Option<CompletedMarker> {
     Some(m.complete(p, SyntaxKind::Literal))
 }
 
+#[allow(unused)]
 const ATOM_START: Set = LITERAL_START.union(Set::new(&[T!['(']]));
 
 const EXPR_RECOVERY_SET: Set = Set::new(&[T![let]]);
