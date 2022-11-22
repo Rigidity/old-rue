@@ -151,4 +151,22 @@ mod tests {
             atom_expr(p);
         }));
     }
+
+    #[test]
+    fn parse_string() {
+        expect![[r#"Literal@0..5
+  String@0..5 "'abc'""#]]
+        .assert_eq(&parse("'abc'", |p| {
+            atom_expr(p);
+        }));
+    }
+
+    #[test]
+    fn parse_integer() {
+        expect![[r#"Literal@0..2
+  Integer@0..2 "42""#]]
+        .assert_eq(&parse("42", |p| {
+            atom_expr(p);
+        }));
+    }
 }
