@@ -1,12 +1,12 @@
 use syntax::SyntaxKind;
 
-use crate::{marker::CompletedMarker, Parser};
+use crate::{parser::CompletedMarker, Parser};
 
 use self::expr::expr;
 
 mod expr;
 
-pub fn root(p: &mut Parser) -> CompletedMarker {
+pub(super) fn root(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
     expr(p);
     m.complete(p, SyntaxKind::Root)

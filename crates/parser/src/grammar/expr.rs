@@ -5,7 +5,7 @@ use crate::{
     Parser,
 };
 
-pub fn expr(p: &mut Parser) -> Option<CompletedMarker> {
+pub(super) fn expr(p: &mut Parser) -> Option<CompletedMarker> {
     expr_bp(p, None, 1)
 }
 

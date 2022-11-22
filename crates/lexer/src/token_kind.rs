@@ -4,7 +4,7 @@ use crate::base::Base;
 pub enum TokenKind {
     Ident,
     String { is_terminated: bool },
-    Integer { base: Base, empty: bool },
+    Integer { base: Base, is_empty: bool },
     DefKw,
     LetKw,
     TrueKw,
@@ -24,6 +24,8 @@ pub enum TokenKind {
     Comma,
     Dot,
     Whitespace,
+    BlockComment { is_terminated: bool },
+    LineComment,
     Error,
 }
 

@@ -113,8 +113,8 @@ impl<'a, 't> Sink<'a, 't> {
                     });
                 }
             }
-            TokenKind::Integer { base, empty } => {
-                if empty {
+            TokenKind::Integer { base, is_empty } => {
+                if is_empty {
                     self.errors.push(ParseError {
                         message: "Expected digits after the integer base prefix".into(),
                         span: text_range(&token.span),

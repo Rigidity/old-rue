@@ -25,6 +25,8 @@ pub enum SyntaxKind {
     Comma,
     Dot,
     Whitespace,
+    LineComment,
+    BlockComment,
     Error,
 
     Eof,
@@ -63,6 +65,8 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::Comma => Self::Comma,
             TokenKind::Dot => Self::Dot,
             TokenKind::Whitespace => Self::Whitespace,
+            TokenKind::LineComment => Self::LineComment,
+            TokenKind::BlockComment { .. } => Self::BlockComment,
             TokenKind::Error => Self::Error,
         }
     }

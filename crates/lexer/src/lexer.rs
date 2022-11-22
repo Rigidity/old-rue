@@ -44,7 +44,17 @@ impl<'a> Lexer<'a> {
                 _ => TokenKind::Minus,
             },
             '*' => TokenKind::Star,
-            '/' => TokenKind::Slash,
+            '/' => match self.char() {
+                '/' => {
+                    self.bump();
+                    self.line_comment()
+                }
+                '*' => {
+                    self.bump();
+                    self.block_comment()
+                }
+                _ => TokenKind::Slash,
+            },
             ':' => TokenKind::Colon,
             ',' => TokenKind::Comma,
             '.' => TokenKind::Dot,
@@ -106,7 +116,7 @@ impl<'a> Lexer<'a> {
 
         TokenKind::Integer {
             base,
-            empty: !has_digits,
+            is_empty: !has_digits,
         }
     }
 
@@ -165,6 +175,37 @@ impl<'a> Lexer<'a> {
         TokenKind::Whitespace
     }
 
+    fn line_comment(&mut self) -> TokenKind {
+        loop {
+            match self.char() {
+                '\n' | '\0' => break,
+                _ => {
+                    self.bump();
+                }
+            }
+        }
+        TokenKind::LineComment
+    }
+
+    fn block_comment(&mut self) -> TokenKind {
+        let is_terminated = loop {
+            match self.char() {
+                '\0' => break false,
+                '*' => {
+                    self.bump();
+                    if self.char() == '/' {
+                        self.bump();
+                        break true;
+                    }
+                }
+                _ => {
+                    self.bump();
+                }
+            }
+        };
+        TokenKind::BlockComment { is_terminated }
+    }
+
     fn char(&mut self) -> char {
         *self.chars.peek().unwrap_or(&'\0')
     }
@@ -210,8 +251,44 @@ mod tests {
     }
 
     #[test]
+    fn string() {
+        assert_eq!(
+            lex("'abc'"),
+            &[TokenKind::String {
+                is_terminated: true
+            }]
+        )
+    }
+
+    #[test]
+    fn integer() {
+        assert_eq!(
+            lex("42"),
+            &[TokenKind::Integer {
+                base: Base::Decimal,
+                is_empty: false
+            }]
+        )
+    }
+
+    #[test]
     fn def_kw() {
         assert_eq!(lex("def"), &[TokenKind::DefKw])
+    }
+
+    #[test]
+    fn let_kw() {
+        assert_eq!(lex("let"), &[TokenKind::LetKw])
+    }
+
+    #[test]
+    fn true_kw() {
+        assert_eq!(lex("true"), &[TokenKind::TrueKw])
+    }
+
+    #[test]
+    fn false_kw() {
+        assert_eq!(lex("false"), &[TokenKind::FalseKw])
     }
 
     #[test]
@@ -287,5 +364,20 @@ mod tests {
     #[test]
     fn whitespace() {
         assert_eq!(lex("    "), &[TokenKind::Whitespace])
+    }
+
+    #[test]
+    fn line_comment() {
+        assert_eq!(lex("// comment"), &[TokenKind::LineComment])
+    }
+
+    #[test]
+    fn block_comment() {
+        assert_eq!(
+            lex("/* comment */"),
+            &[TokenKind::BlockComment {
+                is_terminated: true
+            }]
+        )
     }
 }

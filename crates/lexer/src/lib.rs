@@ -4,7 +4,7 @@ mod lexer;
 mod token;
 mod token_kind;
 
-pub use crate::lexer::*;
-pub use base::*;
-pub use token::*;
-pub use token_kind::*;
+pub use crate::lexer::Lexer;
+pub use base::Base;
+pub use token::Token;
+pub use token_kind::TokenKind;
