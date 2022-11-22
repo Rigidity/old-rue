@@ -113,7 +113,7 @@ fn expr_bp(p: &mut Parser, m: Option<Marker>, bp: u8) -> Option<CompletedMarker>
 fn lhs(p: &mut Parser) -> Option<CompletedMarker> {
     let m;
     let kind = match p.peek() {
-        T![-] => {
+        T![-] | T![!] => {
             m = p.start();
             p.bump_any();
             SyntaxKind::PrefixExpr
