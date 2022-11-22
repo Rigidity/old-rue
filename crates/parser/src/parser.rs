@@ -58,6 +58,8 @@ impl Parser {
 
     pub(crate) fn nth_at(&self, n: usize, kind: SyntaxKind) -> bool {
         match kind {
+            T![&&] => self.at_composite2(n, T![&], T![&]),
+            T![||] => self.at_composite2(n, T![|], T![|]),
             T![<=] => self.at_composite2(n, T![<], T![=]),
             T![>=] => self.at_composite2(n, T![>], T![=]),
             T![==] => self.at_composite2(n, T![=], T![=]),
@@ -91,6 +93,8 @@ impl Parser {
         }
 
         let token_count = match kind {
+            T![&&] => 2,
+            T![||] => 2,
             T![<=] => 2,
             T![>=] => 2,
             T![==] => 2,

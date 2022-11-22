@@ -21,6 +21,9 @@ pub enum SyntaxKind {
     Star,
     Slash,
     Percent,
+    And,
+    Or,
+    Xor,
     Arrow,
     Colon,
     Comma,
@@ -35,6 +38,8 @@ pub enum SyntaxKind {
     Eof,
     Tombstone,
 
+    LazyAnd,
+    LazyOr,
     EqualTo,
     NotEqual,
     LessThanEquals,
@@ -72,6 +77,9 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::Star => Self::Star,
             TokenKind::Slash => Self::Slash,
             TokenKind::Percent => Self::Percent,
+            TokenKind::And => Self::And,
+            TokenKind::Or => Self::Or,
+            TokenKind::Xor => Self::Xor,
             TokenKind::Arrow => Self::Arrow,
             TokenKind::Colon => Self::Colon,
             TokenKind::Comma => Self::Comma,
@@ -103,12 +111,17 @@ macro_rules ! T {
     [*] => { SyntaxKind::Star };
     [/] => { SyntaxKind::Slash };
     [%] => { SyntaxKind::Percent };
+    [&] => { SyntaxKind::And };
+    [|] => { SyntaxKind::Or };
+    [^] => { SyntaxKind::Xor };
     [->] => { SyntaxKind::Arrow };
     [:] => { SyntaxKind::Colon };
     [,] => { SyntaxKind::Comma };
     [.] => { SyntaxKind::Dot };
     [=] => { SyntaxKind::Equals };
     [!] => { SyntaxKind::Exclamation };
+    [&&] => { SyntaxKind::LazyAnd };
+    [||] => { SyntaxKind::LazyOr };
     [==] => { SyntaxKind::EqualTo };
     [!=] => { SyntaxKind::NotEqual };
     [<=] => { SyntaxKind::LessThanEquals };
