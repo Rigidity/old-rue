@@ -58,7 +58,6 @@ impl Parser {
 
     pub(crate) fn nth_at(&self, n: usize, kind: SyntaxKind) -> bool {
         match kind {
-            T![->] => self.at_composite2(n, T![-], T![>]),
             T![<=] => self.at_composite2(n, T![<], T![=]),
             T![>=] => self.at_composite2(n, T![>], T![=]),
             T![==] => self.at_composite2(n, T![=], T![=]),
@@ -75,15 +74,15 @@ impl Parser {
     }
 
     fn at_composite2(&self, n: usize, a: SyntaxKind, b: SyntaxKind) -> bool {
-        self.nth(n) == a && self.nth(n + 1) == b && self.input.is_joint(n)
+        self.nth(n) == a && self.nth(n + 1) == b && self.input.is_joint(self.cursor + n)
     }
 
     fn at_composite3(&self, n: usize, a: SyntaxKind, b: SyntaxKind, c: SyntaxKind) -> bool {
         self.nth(n) == a
             && self.nth(n + 1) == b
             && self.nth(n + 2) == c
-            && self.input.is_joint(n)
-            && self.input.is_joint(n + 1)
+            && self.input.is_joint(self.cursor + n)
+            && self.input.is_joint(self.cursor + n + 1)
     }
 
     pub(crate) fn eat(&mut self, kind: SyntaxKind) -> bool {
@@ -92,7 +91,6 @@ impl Parser {
         }
 
         let token_count = match kind {
-            T![->] => 2,
             T![<=] => 2,
             T![>=] => 2,
             T![==] => 2,

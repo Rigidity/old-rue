@@ -16,11 +16,13 @@ impl Input {
             if token.kind.is_trivia() {
                 joint = false;
             } else {
-                result.push(token.kind.into());
-
                 if joint {
                     result.was_joint();
+                } else {
+                    joint = true;
                 }
+
+                result.push(token.kind.into());
             }
         }
 
@@ -28,19 +30,14 @@ impl Input {
     }
 
     pub fn push(&mut self, kind: SyntaxKind) {
-        if self.joint.len() < self.kinds.len() {
-            self.joint.push(false);
-        }
-
         self.kinds.push(kind);
+        self.joint.push(false);
     }
 
     pub fn was_joint(&mut self) {
-        if self.kinds.len() < self.joint.len() {
-            return;
+        if let Some(last) = self.joint.last_mut() {
+            *last = true;
         }
-
-        self.joint.push(true);
     }
 
     pub fn kind(&self, index: usize) -> SyntaxKind {

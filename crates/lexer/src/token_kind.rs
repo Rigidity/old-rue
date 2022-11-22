@@ -34,6 +34,9 @@ pub enum TokenKind {
 
 impl TokenKind {
     pub fn is_trivia(self) -> bool {
-        matches!(self, Self::Whitespace)
+        matches!(
+            self,
+            Self::Whitespace | Self::LineComment | Self::BlockComment { .. }
+        )
     }
 }
