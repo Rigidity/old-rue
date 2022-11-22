@@ -3,9 +3,11 @@ use syntax::{Set, SyntaxKind, T};
 
 use crate::{event::Event, grammar::root, input::Input, output::Output, sink::Sink};
 
-use self::marker::Marker;
+mod completed_marker;
+mod marker;
 
-pub mod marker;
+pub(crate) use completed_marker::CompletedMarker;
+pub(crate) use marker::Marker;
 
 pub struct Parser {
     input: Input,

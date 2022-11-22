@@ -6,7 +6,7 @@ mod parse_error;
 mod parser;
 mod sink;
 
-pub use crate::parser::*;
-pub use input::*;
-pub use output::*;
-pub use parse_error::*;
+pub use crate::parser::Parser;
+pub use input::Input;
+pub use output::Output;
+pub use parse_error::ParseError;

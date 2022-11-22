@@ -1,7 +1,7 @@
 use syntax::{Set, SyntaxKind, T};
 
 use crate::{
-    marker::{CompletedMarker, Marker},
+    parser::{CompletedMarker, Marker},
     Parser,
 };
 
