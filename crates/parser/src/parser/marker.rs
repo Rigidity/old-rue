@@ -11,14 +11,14 @@ pub(crate) struct Marker {
 }
 
 impl Marker {
-    pub fn new(pos: usize) -> Self {
+    pub(crate) fn new(pos: usize) -> Self {
         Self {
             pos,
             bomb: DropBomb::new("Marker must be either completed or abandoned"),
         }
     }
 
-    pub fn complete(mut self, p: &mut Parser, kind: SyntaxKind) -> CompletedMarker {
+    pub(crate) fn complete(mut self, p: &mut Parser, kind: SyntaxKind) -> CompletedMarker {
         self.bomb.defuse();
         let idx = self.pos as usize;
         match &mut p.events[idx] {
@@ -31,7 +31,7 @@ impl Marker {
         CompletedMarker::new(self.pos)
     }
 
-    pub fn abandon(mut self, p: &mut Parser) {
+    pub(crate) fn abandon(mut self, p: &mut Parser) {
         self.bomb.defuse();
         let idx = self.pos as usize;
         if idx == p.events.len() - 1 {

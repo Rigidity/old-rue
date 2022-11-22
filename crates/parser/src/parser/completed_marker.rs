@@ -7,11 +7,11 @@ pub(crate) struct CompletedMarker {
 }
 
 impl CompletedMarker {
-    pub fn new(pos: usize) -> Self {
+    pub(crate) fn new(pos: usize) -> Self {
         Self { pos }
     }
 
-    pub fn precede(self, p: &mut Parser) -> Marker {
+    pub(crate) fn precede(self, p: &mut Parser) -> Marker {
         let new_pos = p.start();
         let idx = self.pos as usize;
         match &mut p.events[idx] {
@@ -23,7 +23,7 @@ impl CompletedMarker {
         new_pos
     }
 
-    pub fn extend_to(self, p: &mut Parser, mut m: Marker) -> CompletedMarker {
+    pub(crate) fn extend_to(self, p: &mut Parser, mut m: Marker) -> CompletedMarker {
         m.bomb.defuse();
         let idx = m.pos as usize;
         match &mut p.events[idx] {
