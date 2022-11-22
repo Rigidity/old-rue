@@ -125,3 +125,30 @@ fn lhs(p: &mut Parser) -> Option<CompletedMarker> {
     let cm = m.complete(p, kind);
     Some(cm)
 }
+
+#[cfg(test)]
+mod tests {
+    use expect_test::expect;
+
+    use crate::grammar::parse;
+
+    use super::*;
+
+    #[test]
+    fn parse_true() {
+        expect![[r#"Literal@0..4
+  TrueKw@0..4 "true""#]]
+        .assert_eq(&parse("true", |p| {
+            atom_expr(p);
+        }));
+    }
+
+    #[test]
+    fn parse_false() {
+        expect![[r#"Literal@0..5
+  FalseKw@0..5 "false""#]]
+        .assert_eq(&parse("false", |p| {
+            atom_expr(p);
+        }));
+    }
+}

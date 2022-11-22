@@ -28,15 +28,4 @@ where
 }
 
 #[cfg(test)]
-mod tests {
-    use expect_test::expect;
-
-    use super::*;
-
-    #[test]
-    fn parse_root() {
-        expect![[r#"Root@0..0"#]].assert_eq(&parse("", |p| {
-            root(p);
-        }));
-    }
-}
+mod tests {}
