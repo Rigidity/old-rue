@@ -62,6 +62,7 @@ fn current_op(p: &Parser) -> (u8, SyntaxKind) {
         T![-] => (1, T![-]),
         T![*] => (2, T![*]),
         T![/] => (2, T![/]),
+        T![%] => (2, T![%]),
         _ => (0, SyntaxKind::Error),
     }
 }

@@ -55,6 +55,7 @@ impl<'a> Lexer<'a> {
                 }
                 _ => TokenKind::Slash,
             },
+            '%' => TokenKind::Percent,
             ':' => TokenKind::Colon,
             ',' => TokenKind::Comma,
             '.' => TokenKind::Dot,

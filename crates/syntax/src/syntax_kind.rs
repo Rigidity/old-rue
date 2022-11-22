@@ -20,6 +20,7 @@ pub enum SyntaxKind {
     Minus,
     Star,
     Slash,
+    Percent,
     Arrow,
     Colon,
     Comma,
@@ -60,6 +61,7 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::Minus => Self::Minus,
             TokenKind::Star => Self::Star,
             TokenKind::Slash => Self::Slash,
+            TokenKind::Percent => Self::Percent,
             TokenKind::Arrow => Self::Arrow,
             TokenKind::Colon => Self::Colon,
             TokenKind::Comma => Self::Comma,
@@ -88,6 +90,7 @@ macro_rules ! T {
     [-] => { SyntaxKind::Minus };
     [*] => { SyntaxKind::Star };
     [/] => { SyntaxKind::Slash };
+    [%] => { SyntaxKind::Percent };
     [->] => { SyntaxKind::Arrow };
     [:] => { SyntaxKind::Colon };
     [,] => { SyntaxKind::Comma };
