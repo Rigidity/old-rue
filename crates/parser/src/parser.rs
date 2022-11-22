@@ -59,6 +59,13 @@ impl Parser {
     pub(crate) fn nth_at(&self, n: usize, kind: SyntaxKind) -> bool {
         match kind {
             T![->] => self.at_composite2(n, T![-], T![>]),
+            T![<=] => self.at_composite2(n, T![<], T![=]),
+            T![>=] => self.at_composite2(n, T![>], T![=]),
+            T![==] => self.at_composite2(n, T![=], T![=]),
+            T![!=] => self.at_composite2(n, T![!], T![=]),
+            T![<<] => self.at_composite2(n, T![<], T![<]),
+            T![>>] => self.at_composite2(n, T![>], T![>]),
+            T![>>>] => self.at_composite3(n, T![>], T![>], T![>]),
             _ => self.input.kind(self.cursor + n) == kind,
         }
     }
@@ -71,6 +78,14 @@ impl Parser {
         self.nth(n) == a && self.nth(n + 1) == b && self.input.is_joint(n)
     }
 
+    fn at_composite3(&self, n: usize, a: SyntaxKind, b: SyntaxKind, c: SyntaxKind) -> bool {
+        self.nth(n) == a
+            && self.nth(n + 1) == b
+            && self.nth(n + 2) == c
+            && self.input.is_joint(n)
+            && self.input.is_joint(n + 1)
+    }
+
     pub(crate) fn eat(&mut self, kind: SyntaxKind) -> bool {
         if !self.at(kind) {
             return false;
@@ -78,6 +93,13 @@ impl Parser {
 
         let token_count = match kind {
             T![->] => 2,
+            T![<=] => 2,
+            T![>=] => 2,
+            T![==] => 2,
+            T![!=] => 2,
+            T![<<] => 2,
+            T![>>] => 2,
+            T![>>>] => 3,
             _ => 1,
         };
 

@@ -59,6 +59,8 @@ impl<'a> Lexer<'a> {
             ':' => TokenKind::Colon,
             ',' => TokenKind::Comma,
             '.' => TokenKind::Dot,
+            '!' => TokenKind::Exclamation,
+            '=' => TokenKind::Equals,
             '"' => self.string('"'),
             '\'' => self.string('\''),
             c @ '0'..='9' => self.integer(c),

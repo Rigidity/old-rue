@@ -25,6 +25,8 @@ pub enum SyntaxKind {
     Colon,
     Comma,
     Dot,
+    Equals,
+    Exclamation,
     Whitespace,
     LineComment,
     BlockComment,
@@ -32,6 +34,14 @@ pub enum SyntaxKind {
 
     Eof,
     Tombstone,
+
+    EqualTo,
+    NotEqual,
+    LessThanEquals,
+    GreaterThanEquals,
+    LeftShift,
+    RightShift,
+    UnsignedRightShift,
 
     Root,
     Literal,
@@ -66,6 +76,8 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::Colon => Self::Colon,
             TokenKind::Comma => Self::Comma,
             TokenKind::Dot => Self::Dot,
+            TokenKind::Equals => Self::Equals,
+            TokenKind::Exclamation => Self::Exclamation,
             TokenKind::Whitespace => Self::Whitespace,
             TokenKind::LineComment => Self::LineComment,
             TokenKind::BlockComment { .. } => Self::BlockComment,
@@ -95,6 +107,15 @@ macro_rules ! T {
     [:] => { SyntaxKind::Colon };
     [,] => { SyntaxKind::Comma };
     [.] => { SyntaxKind::Dot };
+    [=] => { SyntaxKind::Equals };
+    [!] => { SyntaxKind::Exclamation };
+    [==] => { SyntaxKind::EqualTo };
+    [!=] => { SyntaxKind::NotEqual };
+    [<=] => { SyntaxKind::LessThanEquals };
+    [>=] => { SyntaxKind::GreaterThanEquals };
+    [<<] => { SyntaxKind::LeftShift };
+    [>>] => { SyntaxKind::RightShift };
+    [>>>] => { SyntaxKind::UnsignedRightShift };
 }
 
 pub use T;

@@ -24,6 +24,8 @@ pub enum TokenKind {
     Colon,
     Comma,
     Dot,
+    Exclamation,
+    Equals,
     Whitespace,
     BlockComment { is_terminated: bool },
     LineComment,
