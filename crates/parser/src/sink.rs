@@ -1,4 +1,6 @@
-use lexer::Token;
+use std::ops::Range;
+
+use lexer::{Base, Token, TokenKind};
 use rowan::{GreenNodeBuilder, Language, TextRange, TextSize};
 use syntax::{RueLanguage, SyntaxKind};
 
@@ -93,10 +95,55 @@ impl<'a, 't> Sink<'a, 't> {
         let tokens = &self.tokens[self.cursor..self.cursor + token_count];
 
         for token in tokens {
+            self.handle_errors(token);
             text.push_str(token.text);
         }
 
         self.builder.token(RueLanguage::kind_to_raw(kind), &text);
         self.cursor += token_count;
     }
+
+    fn handle_errors(&mut self, token: &Token) {
+        match token.kind {
+            TokenKind::String { is_terminated } => {
+                if !is_terminated {
+                    self.errors.push(ParseError {
+                        message: "Unterminated string literal".into(),
+                        span: text_range(&token.span),
+                    });
+                }
+            }
+            TokenKind::Integer { base, empty } => {
+                if empty {
+                    self.errors.push(ParseError {
+                        message: "Expected digits after the integer base prefix".into(),
+                        span: text_range(&token.span),
+                    });
+                } else if matches!(base, Base::Binary | Base::Octal) {
+                    let start = token.span.start + 2;
+                    let digits = &token.text[2..];
+
+                    for (index, c) in digits.char_indices() {
+                        if c != '_' && c.to_digit(base as u32).is_none() {
+                            self.errors.push(ParseError {
+                                message: format!("Invalid base {} digit", base as u32),
+                                span: TextRange::at(
+                                    TextSize::from(start as u32 + index as u32),
+                                    TextSize::from(1),
+                                ),
+                            });
+                        }
+                    }
+                }
+            }
+            _ => {}
+        };
+    }
+}
+
+fn text_range(span: &Range<usize>) -> TextRange {
+    TextRange::new(
+        TextSize::from(span.start as u32),
+        TextSize::from(span.end as u32),
+    )
 }

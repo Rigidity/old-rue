@@ -1,10 +1,10 @@
 use std::{iter::Peekable, str::Chars};
 
-use crate::{Token, TokenKind};
-
-use self::chars::{is_ident_continue, is_ident_start, is_whitespace};
-
-mod chars;
+use crate::{
+    base::Base,
+    chars::{is_ident_continue, is_ident_start, is_whitespace},
+    Token, TokenKind,
+};
 
 pub struct Lexer<'a> {
     source: &'a str,
@@ -27,7 +27,6 @@ impl<'a> Lexer<'a> {
 
     fn token(&mut self) -> Token<'a> {
         let start = self.cursor;
-        let mut error = None;
 
         let kind = match self.bump() {
             '(' => TokenKind::OpenParen,
@@ -49,32 +48,11 @@ impl<'a> Lexer<'a> {
             ':' => TokenKind::Colon,
             ',' => TokenKind::Comma,
             '.' => TokenKind::Dot,
-            '"' => {
-                if !self.eat_string('"') {
-                    error = Some("Unterminated string literal");
-                }
-                TokenKind::String
-            }
-            '\'' => {
-                if !self.eat_string('\'') {
-                    error = Some("Unterminated string literal");
-                }
-                TokenKind::String
-            }
-            c if is_ident_start(c) => {
-                self.eat_ident();
-                match &self.source[start..self.cursor] {
-                    "def" => TokenKind::DefKw,
-                    "let" => TokenKind::LetKw,
-                    "true" => TokenKind::TrueKw,
-                    "false" => TokenKind::FalseKw,
-                    _ => TokenKind::Ident,
-                }
-            }
-            c if is_whitespace(c) => {
-                self.eat_whitespace();
-                TokenKind::Whitespace
-            }
+            '"' => self.string('"'),
+            '\'' => self.string('\''),
+            c @ '0'..='9' => self.integer(c),
+            c if is_ident_start(c) => self.ident(start),
+            c if is_whitespace(c) => self.whitespace(),
             _ => TokenKind::Error,
         };
 
@@ -82,30 +60,109 @@ impl<'a> Lexer<'a> {
             text: &self.source[start..self.cursor],
             kind,
             span: start..self.cursor,
-            error,
         }
     }
 
-    fn eat_string(&mut self, quote: char) -> bool {
-        loop {
+    fn string(&mut self, quote: char) -> TokenKind {
+        let is_terminated = loop {
             match self.bump() {
-                '\0' => return false,
-                c if c == quote => return true,
+                '\0' => break false,
+                c if c == quote => break true,
                 _ => {}
             }
+        };
+        TokenKind::String { is_terminated }
+    }
+
+    fn integer(&mut self, digit: char) -> TokenKind {
+        let mut base = Base::Decimal;
+
+        let has_digits = if digit == '0' {
+            match self.char() {
+                'b' => {
+                    base = Base::Binary;
+                    self.bump();
+                    self.eat_decimal_digits()
+                }
+                'o' => {
+                    base = Base::Octal;
+                    self.bump();
+                    self.eat_decimal_digits()
+                }
+                'x' => {
+                    base = Base::Hexadecimal;
+                    self.bump();
+                    self.eat_hexadecimal_digits()
+                }
+                _ => {
+                    self.eat_decimal_digits();
+                    true
+                }
+            }
+        } else {
+            self.eat_decimal_digits();
+            true
+        };
+
+        TokenKind::Integer {
+            base,
+            empty: !has_digits,
         }
     }
 
-    fn eat_ident(&mut self) {
+    fn eat_decimal_digits(&mut self) -> bool {
+        let mut has_digits = false;
+        loop {
+            match self.char() {
+                '_' => {
+                    self.bump();
+                }
+                '0'..='9' => {
+                    has_digits = true;
+                    self.bump();
+                }
+                _ => break,
+            }
+        }
+        has_digits
+    }
+
+    fn eat_hexadecimal_digits(&mut self) -> bool {
+        let mut has_digits = false;
+        loop {
+            match self.char() {
+                '_' => {
+                    self.bump();
+                }
+                '0'..='9' | 'a'..='f' | 'A'..='F' => {
+                    has_digits = true;
+                    self.bump();
+                }
+                _ => break,
+            }
+        }
+        has_digits
+    }
+
+    fn ident(&mut self, start: usize) -> TokenKind {
         while is_ident_continue(self.char()) {
             self.bump();
         }
+
+        match &self.source[start..self.cursor] {
+            "def" => TokenKind::DefKw,
+            "let" => TokenKind::LetKw,
+            "true" => TokenKind::TrueKw,
+            "false" => TokenKind::FalseKw,
+            _ => TokenKind::Ident,
+        }
     }
 
-    fn eat_whitespace(&mut self) {
+    fn whitespace(&mut self) -> TokenKind {
         while is_whitespace(self.char()) {
             self.bump();
         }
+        TokenKind::Whitespace
     }
 
     fn char(&mut self) -> char {

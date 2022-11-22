@@ -5,6 +5,7 @@ use num_derive::{FromPrimitive, ToPrimitive};
 pub enum SyntaxKind {
     Ident,
     String,
+    Integer,
     DefKw,
     LetKw,
     TrueKw,
@@ -40,8 +41,9 @@ pub enum SyntaxKind {
 impl From<TokenKind> for SyntaxKind {
     fn from(value: TokenKind) -> Self {
         match value {
-            TokenKind::Ident => Self::Ident,
-            TokenKind::String => Self::String,
+            TokenKind::Ident { .. } => Self::Ident,
+            TokenKind::String { .. } => Self::String,
+            TokenKind::Integer { .. } => Self::Integer,
             TokenKind::DefKw => Self::DefKw,
             TokenKind::LetKw => Self::LetKw,
             TokenKind::TrueKw => Self::TrueKw,

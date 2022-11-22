@@ -9,7 +9,8 @@ pub fn expr(p: &mut Parser) -> Option<CompletedMarker> {
     expr_bp(p, None, 1)
 }
 
-const LITERAL_START: Set = Set::new(&[T![true], T![false], SyntaxKind::String]);
+const LITERAL_START: Set =
+    Set::new(&[T![true], T![false], SyntaxKind::String, SyntaxKind::Integer]);
 
 fn literal(p: &mut Parser) -> Option<CompletedMarker> {
     if !p.at_set(LITERAL_START) {

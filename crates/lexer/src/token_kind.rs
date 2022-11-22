@@ -1,7 +1,10 @@
+use crate::base::Base;
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum TokenKind {
     Ident,
-    String,
+    String { is_terminated: bool },
+    Integer { base: Base, empty: bool },
     DefKw,
     LetKw,
     TrueKw,
