@@ -1,17 +1,14 @@
-use syntax::SyntaxKind;
-
 use crate::{event::Event, Parser};
 
 use super::Marker;
 
 pub(crate) struct CompletedMarker {
     pos: usize,
-    kind: SyntaxKind,
 }
 
 impl CompletedMarker {
-    pub fn new(pos: usize, kind: SyntaxKind) -> Self {
-        Self { pos, kind }
+    pub fn new(pos: usize) -> Self {
+        Self { pos }
     }
 
     pub fn precede(self, p: &mut Parser) -> Marker {
@@ -36,9 +33,5 @@ impl CompletedMarker {
             _ => unreachable!(),
         }
         self
-    }
-
-    pub fn kind(&self) -> SyntaxKind {
-        self.kind
     }
 }

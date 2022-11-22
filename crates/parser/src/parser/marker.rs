@@ -28,7 +28,7 @@ impl Marker {
             _ => unreachable!(),
         }
         p.events.push(Event::FinishNode);
-        CompletedMarker::new(self.pos, kind)
+        CompletedMarker::new(self.pos)
     }
 
     pub fn abandon(mut self, p: &mut Parser) {
