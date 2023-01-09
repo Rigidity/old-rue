@@ -60,6 +60,7 @@ impl<'a> Lexer<'a> {
             '|' => TokenKind::Or,
             '^' => TokenKind::Xor,
             ':' => TokenKind::Colon,
+            ';' => TokenKind::Semicolon,
             ',' => TokenKind::Comma,
             '.' => TokenKind::Dot,
             '!' => TokenKind::Exclamation,

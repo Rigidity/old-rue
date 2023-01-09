@@ -40,7 +40,7 @@ fn atom_expr(p: &mut Parser) -> Option<CompletedMarker> {
             m.complete(p, SyntaxKind::NameRef)
         }
         _ => {
-            p.err_recover("expected expression", EXPR_RECOVERY_SET);
+            p.err_recover("Expected an expression", EXPR_RECOVERY_SET);
             return None;
         }
     };

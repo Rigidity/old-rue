@@ -26,6 +26,7 @@ pub enum SyntaxKind {
     Xor,
     Arrow,
     Colon,
+    Semicolon,
     Comma,
     Dot,
     Equals,
@@ -49,11 +50,21 @@ pub enum SyntaxKind {
     UnsignedRightShift,
 
     Root,
+
     Literal,
     NameRef,
     ParenExpr,
     BinaryExpr,
     PrefixExpr,
+
+    DefItem,
+    ParamList,
+    Param,
+    Block,
+
+    LetStmt,
+
+    NameType,
 }
 
 impl From<TokenKind> for SyntaxKind {
@@ -82,6 +93,7 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::Xor => Self::Xor,
             TokenKind::Arrow => Self::Arrow,
             TokenKind::Colon => Self::Colon,
+            TokenKind::Semicolon => Self::Semicolon,
             TokenKind::Comma => Self::Comma,
             TokenKind::Dot => Self::Dot,
             TokenKind::Equals => Self::Equals,
@@ -116,6 +128,7 @@ macro_rules ! T {
     [^] => { SyntaxKind::Xor };
     [->] => { SyntaxKind::Arrow };
     [:] => { SyntaxKind::Colon };
+    [;] => { SyntaxKind::Semicolon };
     [,] => { SyntaxKind::Comma };
     [.] => { SyntaxKind::Dot };
     [=] => { SyntaxKind::Equals };

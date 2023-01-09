@@ -25,6 +25,7 @@ pub enum TokenKind {
     Xor,
     Arrow,
     Colon,
+    Semicolon,
     Comma,
     Dot,
     Exclamation,
