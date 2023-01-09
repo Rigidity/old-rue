@@ -1,0 +1,63 @@
+struct Game {
+    public_keys: Map<Player, PublicKey>,
+}
+
+enum Player {
+    X,
+    O,
+}
+
+type Slot = Option<Player>;
+type Board = Player[3][3];
+
+struct Move {
+    player: Player,
+    pos: (Int, Int),
+}
+
+def verify_move(board: Board, move: Move) -> bool {
+    board[move.pos.0][move.pos.1] == Some(move.player)
+}
+
+def can_move(board: Board, move: Move) -> bool {
+    board[move.pos.0][move.pos.1] == None
+}
+
+def apply_move(board: Board, move: Move) -> Board {
+    board.update(
+        move.pos.0,
+        (column) => column.set(
+            move.pos.1,
+            move.player,
+        ),
+    )
+}
+
+def main(
+    game: Game,
+    board: Board,
+    previous: Option<Move>,
+    move: Move,
+    conditions: List<Condition>,
+) -> List<Condition> {
+    if previous.is_some() && !board.verify_move(previous) {
+        raise "Invalid board state, previous move does not match";
+    }
+
+    if !board.can_move(move) {
+        raise "Invalid move, board position already occupied";
+    }
+
+    conditions
+        .after(Condition::agg_sig_me(
+            game.public_keys[move.player],
+            tree_hash([move, conditions]),
+        ))
+        .after(Condition::create_coin(
+            main.tree_hash().curry(
+                game,
+                board.apply_move(move),
+                Some(move),
+            )
+        ))
+}
